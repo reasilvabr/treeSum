@@ -18,9 +18,11 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 6.0.x
-    - name: Restore dependencies
-      run: dotnet restore
+    - name: Restore app dependencies
+      run: dotnet restore app
     - name: Build
       run: dotnet build app --no-restore
+    - name: Restore test dependencies
+      run: dotnet restore test
     - name: Test
       run: dotnet test test --no-build --verbosity normal
