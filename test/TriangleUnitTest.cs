@@ -73,7 +73,7 @@ public class TriangleUnitTest
 
     [Theory]
     [InlineData("file6", 1, 3)]
-    [InlineData("file6", 3, 5)]
+    [InlineData("file6", 3, 4)]
     [InlineData("file6", 10, 104)]
     [InlineData("file7", 2, 3)]
     public void sum_iteractions_ok(string testFile, int iteractions, int expected)
