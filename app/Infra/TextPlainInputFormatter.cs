@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc.Formatters;
-
+namespace Triangle.Infra;
 public class TextPlainInputFormatter : InputFormatter
 {
     private const string ContentType = "text/plain";

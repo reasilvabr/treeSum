@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Triangle.Domain;
+using Triangle.Infra;
 
 namespace app.Controllers;
 
@@ -11,13 +12,13 @@ public class TreeSumController : ControllerBase
 
     public TreeSumController(ILogger<TreeSumController> logger)
     {
-        _logger = logger;
+        _logger = logger;        
     }
 
     [HttpPost(Name = "SumTree")]
-    public IActionResult SumTree([FromBody] string treeDefinition)
+    public IActionResult SumTree([FromBody] string treeDefinition, [FromQuery] int depthSearch = 5)
     {
-        TriangleEntity triangle = new TriangleEntity(treeDefinition);
+        TriangleEntity triangle = new TriangleEntity(treeDefinition, depthSearch);
         return Ok(triangle.MaxSum);
     }
 }

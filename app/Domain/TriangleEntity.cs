@@ -1,10 +1,14 @@
+using System.Diagnostics;
+
 namespace Triangle.Domain;
 
 public class TriangleEntity
 {
-    LinkedList<LinkedList<GraphNode>> _items;
-    public TriangleEntity(string txt)
+    readonly LinkedList<LinkedList<GraphNode>> _items;
+    readonly int _maxIteractions;
+    public TriangleEntity(string txt, int maxIteractions = 5)
     {
+        _maxIteractions = maxIteractions > 0 ? maxIteractions : throw new InvalidOperationException("Must have at least 1 iteraction.");
         _maxSum = -1;
         _items = new();
         BuildGraph(txt);
@@ -17,10 +21,9 @@ public class TriangleEntity
         {
             var lineItems = new LinkedList<GraphNode>();
             var nodes =
-                line.Split(" ",
+                line.Trim().Split(" ",
                     StringSplitOptions.RemoveEmptyEntries
                     & StringSplitOptions.TrimEntries)
-                    .Where(val => val != string.Empty)
                     .Select(
                         val => new GraphNode(int.Parse(val)));
 
@@ -51,32 +54,39 @@ public class TriangleEntity
             {
                 _maxSum = Sum(_items.ElementAt(0).ElementAt(0)).Result;
             }
+            Debug.WriteLine(_maxSum);
             return _maxSum;
         }
     }
 
-    async Task<int> Sum(GraphNode node, int sum = 0, int iteraction = 0)
+    async Task<int> Sum(
+        GraphNode node,
+        int sum = 0,
+        int depth = 0,
+        string label = "root",
+        int iteraction = 0)
     {
         iteraction++;
         sum += node.Value;
-        var leftSum = sum;
-        var rightSum = sum;
-        if (node.Left != null && node.Right != null)
-        {
-            var sumLeft = Sum(node.Left, sum, iteraction);
-            var sumRight = Sum(node.Right, sum, iteraction);
-            await Task.WhenAll(sumLeft, sumRight);
-            leftSum = sumLeft.Result;
-            rightSum = sumRight.Result;
 
-            if (iteraction > 1)
-            {
-                if (leftSum > rightSum)
-                    return await Sum(node.Left, sum, 0);
-                return await Sum(node.Right, sum, 0);
-            }
+        if (!node.HasAdjacents || iteraction > _maxIteractions)
+            return sum;
+
+        var sumL = Sum(node.Left, sum, depth + 1, $"L{iteraction}", iteraction);
+        var sumR = Sum(node.Right, sum, depth + 1, $"R{iteraction}", iteraction);
+        await Task.WhenAll(sumL, sumR);
+        var leftSum = sumL.Result;
+        var rightSum = sumR.Result;
+
+        if (iteraction == 1)
+        {
+            Debug.WriteLine(leftSum > rightSum ? " <= " : " => ");
+            if (leftSum >= rightSum)
+                return await Sum(node.Left, sum, depth + 1, "L");
+            return await Sum(node.Right, sum, depth + 1, "R");
         }
-        return leftSum > rightSum ? leftSum : rightSum;
+        Debug.Write(".");
+        return leftSum >= rightSum ? leftSum : rightSum;
     }
 
     public GraphNode GetNode(int y, int x)
@@ -93,6 +103,7 @@ public class TriangleEntity
             Value = value;
         }
         public int Value { get; set; }
+        public bool HasAdjacents => Left != null && Right != null;
         public GraphNode? Left { get; set; }
         public GraphNode? Right { get; set; }
     }

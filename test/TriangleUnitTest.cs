@@ -58,4 +58,17 @@ public class TriangleUnitTest
         var actual = triangle.MaxSum;
         Assert.Equal(expected, actual);
     }
+
+    [Theory]
+    [InlineData("file6", 1, 3)]
+    [InlineData("file6", 3, 4)]
+    [InlineData("file6", 10, 104)]
+    [InlineData("file7", 2, 3)]
+    public void sum_iteractions_ok(string testFile, int iteractions, int expected)
+    {
+        var testString = File.ReadAllText($"./testFiles/{testFile}.txt");
+        var triangle = new TriangleEntity(testString, iteractions);
+        var actual = triangle.MaxSum;
+        Assert.Equal(expected, actual);
+    }
 }
