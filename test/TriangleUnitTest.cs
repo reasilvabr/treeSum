@@ -33,6 +33,18 @@ public class TriangleUnitTest
     }
 
     [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(-10)]
+    public void create_tree_negative_iteractions_nok(int iteraction)
+    {
+        var action = delegate() { 
+            var triangle = new TriangleEntity("0", iteraction);
+            };
+        Assert.Throws<InvalidOperationException>(action);
+    }
+
+    [Theory]
     [InlineData(0, 0, 2, 3)]
     [InlineData(2, 1, 8, 9)]
     [InlineData(3, 3, 14, 15)]
